@@ -4,6 +4,8 @@
 # Xcode build artifacts
 build/
 DerivedData/
+*/build/
+*/DerivedData/
 
 # Xcode user settings
 xcuserdata/
@@ -17,6 +19,7 @@ xcuserdata/
 # Xcode workspace state
 *.xccheckout
 *.xcscmblueprint
+*.xcuserdatad/
 
 # Swift Package Manager
 .build/
