@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-@available(iOS 17.0, *)
+
 struct ContentView: View {
     var body: some View {
         LoginKit("user_log_status") {
@@ -22,9 +22,5 @@ struct ContentView: View {
 }
 
 #Preview {
-    if #available(iOS 17.0, *) {
-        ContentView()
-    } else {
-        // Fallback on earlier versions
-    }
+    ContentView()
 }

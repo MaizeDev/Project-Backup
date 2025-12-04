@@ -6,9 +6,10 @@
 //
 
 import SwiftUI
+import FirebaseAuth
 
 /// RegisterAccount
-@available(iOS 17.0, *)
+
 struct RegisterAccount: View {
     /// Properties
     /// 属性
@@ -16,38 +17,40 @@ struct RegisterAccount: View {
     @State private var password: String = ""
     @State private var passwordConfirmation: String = ""
     @State private var isPerforming: Bool = false
-    
+    @State private var alert: AlertModal = .init(message: "")
+    @State private var userVerificationModal: Bool = false
+    @FocusState private var isFocused: Bool
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            
             VStack(alignment: .leading, spacing: 8) {
                 Text("Let's get you started!")
                     .font(.title)
-                
+
                 Text("It's quick and easy.")
                     .textScale(.secondary)
             }
             .fontWeight(.medium)
             .padding(.top, 5)
-            
+
             IconTextField(hint: "Email Address", symbol: "envelope", value: $email)
                 .padding(.top, 10)
-            
+
             IconTextField(hint: "Password", symbol: "lock", isPassword: true, value: $password)
-            
+
             IconTextField(hint: "Confirm Password", symbol: "lock", isPassword: true, value: $passwordConfirmation)
-            
+
             TaskButton(title: "Create Account") {
-                try? await Task.sleep(for: .seconds(5))
+                isFocused = false
+                await createNewAccount()
             } onStatusChange: { isLoading in
                 isPerforming = isLoading
             }
             .disabled(!isSignInButtonEnabled)
             .padding(.top, 15)
-            
 
             Spacer(minLength: 0)
-            
+
             /// YOUR Other Links for account Creation
             /// 用户创建其他链接
             HStack(spacing: 4) {
@@ -62,12 +65,41 @@ struct RegisterAccount: View {
             .foregroundStyle(Color.primary.secondary)
             .frame(maxWidth: .infinity)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading )
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .padding([.horizontal, .top], 20)
         .padding(.bottom, isiOS26 ? 0 : 10)
         .allowsHitTesting(!isPerforming)
         .opacity(isPerforming ? 0.7 : 1)
+        .focused($isFocused)
+        .customAlert($alert)
+        .sheetAlert(
+            isPresented: $userVerificationModal,
+            prominentSymbol: "envelope.badge",
+            title: "Email Verification",
+            message: "We have sent a verification email to\nyour address. Please check your inbox.",
+            buttonTitle: "Verified?",
+            buttonAction: {
+            }
+        )
+        /// Disabling Interractive dismiss when keyboard is active/isPerforming action
+        .interactiveDismissDisabled(isFocused || isPerforming)
     }
+    
+    private func createNewAccount() async {
+        do {
+            let auth = Auth.auth()
+            let result = try await auth.createUser(withEmail: email, password: password)
+            /// Sending Email Verification Link to confirm user!
+            try await result.user.sendEmailVerification()
+            userVerificationModal = true
+        } catch {
+            /// You can do additional checks here, such as if a user is created by failed to send email, then in that case you can delete that user and so on!
+            /// For now, I'm keeping it simple!
+            alert.message = error.localizedDescription
+            alert.show = true
+        }
+    }
+
     var isSignInButtonEnabled: Bool {
         !email.isEmpty && !password.isEmpty && password == passwordConfirmation
     }

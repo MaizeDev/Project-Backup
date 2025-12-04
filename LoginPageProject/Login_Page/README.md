@@ -55,7 +55,7 @@ Login_Page/
 - 在 `ContentView` 的 `NavigationStack` 中填充登录后功能。
 
 ### 要求
-- Xcode iOS 17+ SDK（扩展自 iOS 16.4 可编译，主要视图标注 `@available(iOS 17.0, *)`）。
+- Xcode iOS 17+ SDK
 - 纯 SwiftUI，无第三方依赖。
 
 ## English
@@ -91,5 +91,5 @@ Login_Page/
 - Populate `ContentView`’s `NavigationStack` with your post-login experience.
 
 ### Requirements
-- Xcode with iOS 17+ SDK (extensions compile from iOS 16.4; main views are `@available(iOS 17.0, *)`).
+- Xcode with iOS 17+ SDK 
 - SwiftUI only; no third-party dependencies.

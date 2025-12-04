@@ -8,14 +8,15 @@
 import SwiftUI
 
 // MARK: - Custom Task Button, which will disable it's button action till it's task is completed!
+
 /// 自定义任务按钮，该按钮将在任务完成前禁用其点击功能！
-@available(iOS 17.0, *)
+
 struct TaskButton: View {
     var title: String
-    var task: () async -> ()
-    var onStatusChange: (Bool) -> () = { _ in }
+    var task: () async -> Void
+    var onStatusChange: (Bool) -> Void = { _ in }
     @State private var isLoading: Bool = false
-    
+
     var body: some View {
         Button {
             Task {
@@ -45,7 +46,7 @@ struct TaskButton: View {
         /// Disabling the button when it's performing its action
         /// 当按钮执行其功能时禁用它
         .disabled(isLoading)
-        .onChange(of: isLoading) { oldValue, newValue in
+        .onChange(of: isLoading) { _, newValue in
             /// Optional One!
             /// 可选 1
             withAnimation(.easeInOut(duration: 0.25)) {

@@ -6,10 +6,15 @@
 //
 
 import SwiftUI
+import Firebase
 
-@available(iOS 17.0, *)
 @main
 struct Login_PageApp: App {
+    
+    init() {
+        FirebaseApp.configure()
+    }
+    
     var body: some Scene {
         WindowGroup {
             ContentView()

@@ -6,10 +6,11 @@
 //
 
 import SwiftUI
+import FirebaseAuth
 
 /// Login View
 /// 登录视图
-@available(iOS 17.0, *)
+
 struct LoginView: View {
     /// Properties
     /// 属性
@@ -48,9 +49,8 @@ struct LoginView: View {
 
             TaskButton(title: "Sign In") {
                 isFocused = false
-                try? await Task.sleep(for: .seconds(1))
-                alert.message = "There is no user with this email address"
-                alert.show.toggle()
+                await login()
+                
             } onStatusChange: { isLoading in
                 isPerforming = isLoading
             }
@@ -113,12 +113,26 @@ struct LoginView: View {
             message: "We have sent a verification email to\nyour address. Please check your inbox.",
             buttonTitle: "Verified?",
             buttonAction: {
-                
             }
         )
         .customAlert($alert)
         .focused($isFocused)
         .ignoresSafeArea(.keyboard, edges: .bottom)
+    }
+    
+    private func login() async {
+        do {
+            let auth = Auth.auth()
+            let result = try await auth.signIn(withEmail: email, password: password)
+            if result.user.isEmailVerified {
+                /// Success Login
+            } else {
+                userNotVerified = true
+            }
+        } catch {
+            alert.message = error.localizedDescription
+            alert.show = true
+        }
     }
 
     var isSignInButtonEnabled: Bool {
