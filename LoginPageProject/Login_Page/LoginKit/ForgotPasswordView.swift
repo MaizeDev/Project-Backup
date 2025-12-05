@@ -13,7 +13,7 @@ struct ForgotPassword: View {
     @State private var isPerforming: Bool = false
     @State private var alert: AlertModal = .init(message: "")
     @Environment(\.dismiss) var dismiss
-    c
+    @FocusState private var isFocused: Bool
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {

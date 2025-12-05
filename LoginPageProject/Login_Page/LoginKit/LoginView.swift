@@ -12,6 +12,7 @@ import FirebaseAuth
 /// 登录视图
 
 struct LoginView: View {
+    var onSuccessLogin: () -> () = { }
     /// Properties
     /// 属性
     @State private var email: String = ""
@@ -93,7 +94,7 @@ struct LoginView: View {
         .allowsHitTesting(!isPerforming)
         .opacity(isPerforming ? 0.7 : 1)
         .sheet(isPresented: $createAccount) {
-            RegisterAccount()
+            RegisterAccount(onSuccessLogin: onSuccessLogin)
                 .presentationDetents([.height(400)])
                 .presentationBackground(.background)
                 /// Sinec iOS 26 adpats its corner radius to it's device's corner radius!
@@ -113,6 +114,19 @@ struct LoginView: View {
             message: "We have sent a verification email to\nyour address. Please check your inbox.",
             buttonTitle: "Verified?",
             buttonAction: {
+                /// Checking if the email is verified
+                /// 检查邮箱是否验证
+                if let user = Auth.auth().currentUser {
+                    try? await user.reload()
+                    if user.isEmailVerified {
+                        /// Sucess Login
+                        print("Success!")
+                        userNotVerified = false
+                        /// Optional
+                        try? await Task.sleep(for: .seconds(0.25))
+                        onSuccessLogin()
+                    }
+                }
             }
         )
         .customAlert($alert)
@@ -126,7 +140,10 @@ struct LoginView: View {
             let result = try await auth.signIn(withEmail: email, password: password)
             if result.user.isEmailVerified {
                 /// Success Login
+                print("Sign In Success!")
+                onSuccessLogin()
             } else {
+                try? await result.user.sendEmailVerification()
                 userNotVerified = true
             }
         } catch {

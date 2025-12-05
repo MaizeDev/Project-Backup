@@ -11,6 +11,7 @@ import FirebaseAuth
 /// RegisterAccount
 
 struct RegisterAccount: View {
+    var onSuccessLogin: () -> () = { }
     /// Properties
     /// 属性
     @State private var email: String = ""
@@ -20,6 +21,7 @@ struct RegisterAccount: View {
     @State private var alert: AlertModal = .init(message: "")
     @State private var userVerificationModal: Bool = false
     @FocusState private var isFocused: Bool
+    @Environment(\.dismiss) var dismiss
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -79,6 +81,20 @@ struct RegisterAccount: View {
             message: "We have sent a verification email to\nyour address. Please check your inbox.",
             buttonTitle: "Verified?",
             buttonAction: {
+                /// Checking if the email is verified
+                /// 检查邮箱是否验证
+                if let user = Auth.auth().currentUser {
+                    try? await user.reload()
+                    if user.isEmailVerified {
+                        /// Sucess Login
+                        print("Success!")
+                        dismiss()
+                        /// Optional: Allowing to have dismiss animation
+                        /// 可选: 允许显示隐藏动画
+                        try? await Task.sleep(for: .seconds(0.25))
+                        onSuccessLogin()
+                    }
+                }
             }
         )
         /// Disabling Interractive dismiss when keyboard is active/isPerforming action

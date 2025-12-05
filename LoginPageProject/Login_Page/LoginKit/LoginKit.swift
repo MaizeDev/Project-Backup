@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FirebaseAuth
 
 struct LoginKit<Content: View>: View {
     init(_ appStorageID: String, @ViewBuilder content: @escaping () -> Content) {
@@ -24,7 +25,15 @@ struct LoginKit<Content: View>: View {
                 content
             } else {
                 /// Login/Register View
-                LoginView()
+                LoginView{
+                    /// Add more code if you wish to do anything after successful login!
+                    isLoggedIn = true
+                }
+            }
+        }
+        .task {
+            if let user = Auth.auth().currentUser, !user.isEmailVerified {
+                try? Auth.auth().signOut()
             }
         }
     }
